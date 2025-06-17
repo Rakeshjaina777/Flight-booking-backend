@@ -1,0 +1,102 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------ Enums ------------------
+
+enum SeatClass {
+  ECONOMY
+  BUSINESS
+  FIRST
+}
+
+enum FlightStatus {
+  ON_TIME
+  DELAYED
+  CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// ------------------ MODELS ------------------
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  age       Int
+  role      UserRole  @default(USER)
+   password  String    
+  
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Flight {
+  id          String        @id @default(uuid())
+  from        String
+  to          String
+  departure   DateTime
+  arrival     DateTime
+  status      FlightStatus  @default(ON_TIME)
+  seats       Seat[]
+  bookings    Booking[]
+  fare        Fare?         @relation(fields: [fareId], references: [id])
+  fareId      String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([from, to])
+  @@index([departure])
+}
+
+model Seat {
+  id         String     @id @default(uuid())
+  seatNumber String
+  seatClass  SeatClass
+  isBooked   Boolean    @default(false)
+  isLocked   Boolean    @default(false)
+  flight     Flight     @relation(fields: [flightId], references: [id])
+  flightId   String
+  booking    Booking?
+  bookingId  String?
+
+  @@index([flightId, seatNumber], name: "flight_seat_idx")
+}
+
+model Booking {
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  flight     Flight    @relation(fields: [flightId], references: [id])
+  flightId   String
+  seat       Seat      @relation(fields: [seatId], references: [id])
+  seatId     String    @unique
+  finalFare  Float
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([flightId])
+}
+
+model Fare {
+  id          String   @id @default(uuid())
+  economy     Float
+  business    Float
+  first       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Flight Flight[]
+}
