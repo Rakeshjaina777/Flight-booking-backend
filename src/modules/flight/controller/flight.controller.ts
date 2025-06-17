@@ -51,7 +51,7 @@ export class FlightController {
         departure: '2025-06-25T10:00:00.000Z',
         arrival: '2025-06-25T12:30:00.000Z',
         status: 'ON_TIME',
-        fareId: 'fare-uuid',
+        fareId: '123e4567-e89b-12d3-a456-426614174000',
         createdAt: '2025-06-18T00:00:00.000Z',
       },
     },
