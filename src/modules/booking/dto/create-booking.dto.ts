@@ -34,3 +34,12 @@ export class CreateBookingDto {
   @IsNotEmpty()
   finalFare: number;
 }
+
+export class LockSeatDto {
+  @ApiProperty({
+    example: 'e7b11c52-ff26-4bfb-9a02-52cd7bfae123',
+    description: 'The UUID of the user attempting to lock the seat',
+  })
+  @IsUUID()
+  userId: string;
+}
