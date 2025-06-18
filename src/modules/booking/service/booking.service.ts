@@ -6,6 +6,7 @@ import {
 import { CreateBookingDto } from '../dto/create-booking.dto';
 import { lockSeat, isSeatLocked } from 'src/common/utils/seat-lock.util';
 import { PrismaService } from 'prisma/prisma.service';
+import { GroupBookingDto } from '../dto/group-booking.dto';
 
 @Injectable()
 export class BookingService {
@@ -153,5 +154,41 @@ export class BookingService {
       activeBookings: bookings,
       orphanedBookedSeats: orphanedSeats,
     };
+  }
+  async confirmGroupBooking(dto: GroupBookingDto) {
+    const availableSeats = await this.prisma.seat.findMany({
+      where: {
+        flightId: dto.flightId,
+        seatClass: dto.seatClass,
+        isBooked: false,
+      },
+      orderBy: { seatNumber: 'asc' },
+    });
+
+    if (availableSeats.length < dto.count) {
+      throw new ConflictException('Not enough available seats');
+    }
+
+    const seatsToBook = availableSeats.slice(0, dto.count);
+
+    const bookings = await Promise.all(
+      seatsToBook.map((seat) =>
+        this.prisma.booking.create({
+          data: {
+            userId: dto.userId,
+            flightId: dto.flightId,
+            seatId: seat.id,
+            finalFare: 2500, // can replace with calculatedFare logic
+          },
+        }),
+      ),
+    );
+
+    await this.prisma.seat.updateMany({
+      where: { id: { in: seatsToBook.map((s) => s.id) } },
+      data: { isBooked: true },
+    });
+
+    return { message: 'Group booking confirmed', bookings };
   }
 }
