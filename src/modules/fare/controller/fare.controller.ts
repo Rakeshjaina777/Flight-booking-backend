@@ -72,8 +72,45 @@ export class FareController {
       },
     },
   })
+ 
+  @ApiOperation({ summary: 'User: Calculate dynamic fare based on flight and seat context' })
+  @ApiBody({
+    type: CalculateFareDto,
+    examples: {
+      example1: {
+        summary: 'Example Fare Calculation Payload',
+        value: {
+          flightId: 'flight-uuid-123',
+          seatClass: 'ECONOMY',
+          isWindow: true,
+          passengerAge: 65,
+          bookedSeats: 80,
+          totalSeats: 100,
+          timeBeforeDepartureInMinutes: 90,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the calculated final fare and detailed breakdown',
+    schema: {
+      example: {
+        finalFare: 3465,
+        breakdown: {
+          baseFare: 3000,
+          windowCharge: 200,
+          ageDiscount: -150,
+          surgeMultiplier: 1.1,
+          timeAdjustment: 1.05,
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Flight or fare not found' })
   @Post('calculate')
   calculateFare(@Body() dto: CalculateFareDto) {
     return this.fareService.calculate(dto);
   }
+
 }
