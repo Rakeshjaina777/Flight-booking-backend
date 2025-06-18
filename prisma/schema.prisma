@@ -67,10 +67,12 @@ model Seat {
   seatClass  SeatClass
   isBooked   Boolean    @default(false)
   isLocked   Boolean    @default(false)
+
   flight     Flight     @relation(fields: [flightId], references: [id])
   flightId   String
-  booking    Booking?
-  bookingId  String?
+
+  booking    Booking?   @relation("SeatBooking", fields: [bookingId], references: [id])
+  bookingId  String?    @unique
 
   @@index([flightId, seatNumber], name: "flight_seat_idx")
 }
@@ -79,10 +81,13 @@ model Booking {
   id         String    @id @default(uuid())
   user       User      @relation(fields: [userId], references: [id])
   userId     String
+
   flight     Flight    @relation(fields: [flightId], references: [id])
   flightId   String
-  seat       Seat      @relation(fields: [seatId], references: [id])
-  seatId     String    @unique
+
+  seat       Seat?     @relation("SeatBooking")
+  seatId     String?   @unique
+
   finalFare  Float
   createdAt  DateTime  @default(now())
 

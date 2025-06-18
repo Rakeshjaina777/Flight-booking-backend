@@ -13,7 +13,7 @@ export class BookingController {
     type: LockSeatDto,
     examples: {
       example1: {
-        value: { userId: 'user-1234-uuid' },
+        value: { userId: 'effb2932-9351-4b1e-9dc1-957289f7f88c' },
       },
     },
   })
@@ -23,8 +23,8 @@ export class BookingController {
     schema: {
       example: {
         message: '✅ Seat locked successfully',
-        seatId: 'seat-uuid',
-        userId: 'user-uuid',
+        seatId: '407addb7-1929-43aa-b49e-fa4db1dba40f',
+        userId: 'effb2932-9351-4b1e-9dc1-957289f7f88c',
         lockDuration: 180,
         flightDetails: {
           id: 'flight-uuid',
@@ -47,9 +47,9 @@ export class BookingController {
       example1: {
         summary: 'Booking Payload',
         value: {
-          userId: 'user-uuid',
-          seatId: 'seat-uuid',
-          flightId: 'flight-uuid',
+          userId: 'effb2932-9351-4b1e-9dc1-957289f7f88c',
+          seatId: '407addb7-1929-43aa-b49e-fa4db1dba40f',
+          flightId: '30031659-7ac0-4fe7-9160-30eaaee4724c',
           finalFare: 3200,
         },
       },

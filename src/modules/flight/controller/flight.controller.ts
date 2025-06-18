@@ -35,7 +35,7 @@ export class FlightController {
           to: 'Mumbai',
           departure: '2025-06-25T10:00:00.000Z',
           arrival: '2025-06-25T12:30:00.000Z',
-          fareId: 'fare-uuid',
+          fareId: 'c68f8d03-6077-44aa-a2b6-60d3b86d8bc5',
         },
       },
     },
@@ -53,6 +53,7 @@ export class FlightController {
         status: 'ON_TIME',
         fareId: '123e4567-e89b-12d3-a456-426614174000',
         createdAt: '2025-06-18T00:00:00.000Z',
+        updatedAt: '2025-06-18T00:00:00.000Z',
       },
     },
   })

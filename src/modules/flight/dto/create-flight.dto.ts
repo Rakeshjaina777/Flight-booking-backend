@@ -1,5 +1,5 @@
+import { IsString, IsDateString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID, IsDateString } from 'class-validator';
 
 export class CreateFlightDto {
   @ApiProperty({ example: 'Delhi' })
@@ -18,7 +18,12 @@ export class CreateFlightDto {
   @IsDateString()
   arrival: string;
 
-  @ApiProperty({ example: 'fare-uuid' })
-  @IsUUID()
-  fareId: string;
+  @ApiProperty({
+    example: 'c68f8d03-6077-44aa-a2b6-60d3b86d8bc5',
+    required: false,
+    description: 'UUID of the existing fare object (optional)',
+  })
+  @IsOptional()
+  @IsString()
+  fareId?: string;
 }

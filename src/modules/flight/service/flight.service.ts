@@ -7,12 +7,24 @@ import { UpdateFlightStatusDto } from '../dto/update-flight-status.dto';
 export class FlightService {
   constructor(private prisma: PrismaService) {}
 
-  create(dto: CreateFlightDto) {
+  async create(dto: CreateFlightDto) {
+    // Optional: check if fareId exists before attaching it
+    if (dto.fareId) {
+      const fareExists = await this.prisma.fare.findUnique({
+        where: { id: dto.fareId },
+      });
+      if (!fareExists) {
+        throw new NotFoundException('Fare ID not found');
+      }
+    }
+
     return this.prisma.flight.create({
       data: {
-        ...dto,
+        from: dto.from,
+        to: dto.to,
         departure: new Date(dto.departure),
         arrival: new Date(dto.arrival),
+        fareId: dto.fareId,
       },
     });
   }

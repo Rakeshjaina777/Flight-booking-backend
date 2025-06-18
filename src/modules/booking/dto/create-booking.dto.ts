@@ -37,7 +37,7 @@ export class CreateBookingDto {
 
 export class LockSeatDto {
   @ApiProperty({
-    example: 'e7b11c52-ff26-4bfb-9a02-52cd7bfae123',
+    example: '07addb7-1929-43aa-b49e-fa4db1dba40f',
     description: 'The UUID of the user attempting to lock the seat',
   })
   @IsUUID()
