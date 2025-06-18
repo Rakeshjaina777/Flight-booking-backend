@@ -12,7 +12,7 @@ export class BookingService {
   constructor(private prisma: PrismaService) {}
 
   /**
-   * Locks a seat for 180 seconds for a specific user
+   * Lock a seat for a user temporarily (180 seconds)
    */
   async lockSeat(seatId: string, userId: string) {
     const seat = await this.prisma.seat.findUnique({ where: { id: seatId } });
@@ -22,7 +22,7 @@ export class BookingService {
       throw new ConflictException('⛔ Seat already locked or booked');
     }
 
-    const locked = lockSeat(seatId, 180); // Lock seat temporarily
+    const locked = lockSeat(seatId, 180); // Lock for 180 seconds
     if (!locked) throw new ConflictException('⏳ Seat is temporarily locked');
 
     const flight = await this.prisma.flight.findUnique({
@@ -46,15 +46,16 @@ export class BookingService {
   }
 
   /**
-   * Confirms a booking and marks seat as booked
+   * Confirm a booking: update booking table and lock seat
    */
   async confirmBooking(dto: CreateBookingDto) {
     const seat = await this.prisma.seat.findUnique({
       where: { id: dto.seatId },
     });
 
-    if (!seat || seat.isBooked)
-      throw new ConflictException('Seat is already booked');
+    if (!seat || seat.isBooked) {
+      throw new ConflictException('❗ Seat is already booked or not available');
+    }
 
     const booking = await this.prisma.booking.create({
       data: {
@@ -69,7 +70,7 @@ export class BookingService {
       where: { id: dto.seatId },
       data: {
         isBooked: true,
-        bookingId: booking.id, // ✅ FIX HERE
+        bookingId: booking.id, // Required to maintain referential integrity
       },
     });
 
@@ -83,15 +84,17 @@ export class BookingService {
   }
 
   /**
-   * Cancels a booking and resets the seat
+   * Cancel a booking and free the seat
    */
   async cancelBooking(bookingId: string) {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
     });
-
     if (!booking) throw new NotFoundException('❌ Booking not found');
 
+    if (!booking.seatId) {
+      throw new ConflictException('❗ Booking does not have a valid seatId');
+    }
     await this.prisma.seat.update({
       where: { id: booking.seatId },
       data: {
@@ -110,7 +113,7 @@ export class BookingService {
   }
 
   /**
-   * Gets user's bookings and any orphaned seats
+   * Retrieve bookings and orphaned booked seats for a user
    */
   async getUserBookings(userId: string) {
     const bookings = await this.prisma.booking.findMany({
@@ -121,7 +124,7 @@ export class BookingService {
       },
     });
 
-    // Booked seats without a booking ID (data inconsistency or partial flow)
+    // Optional fallback for orphaned booked seats (inconsistent data)
     const orphanedSeats = await this.prisma.seat.findMany({
       where: {
         bookingId: null,
