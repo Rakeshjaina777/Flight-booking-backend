@@ -13,7 +13,10 @@ export class FareController {
     schema: {
       type: 'object',
       properties: {
-        flightId: { type: 'string', example: 'flight-uuid' },
+        flightId: {
+          type: 'string',
+          example: '30031659-7ac0-4fe7-9160-30eaaee4724c',
+        },
         economy: { type: 'number', example: 3000 },
         business: { type: 'number', example: 6000 },
         first: { type: 'number', example: 12000 },
@@ -26,7 +29,7 @@ export class FareController {
     description: 'Base fare set and linked to the flight',
     schema: {
       example: {
-        id: 'fare-uuid',
+        id: '30031659-7ac0-4fe7-9160-30eaaee4724c',
         economy: 3000,
         business: 6000,
         first: 12000,
@@ -72,15 +75,16 @@ export class FareController {
       },
     },
   })
- 
-  @ApiOperation({ summary: 'User: Calculate dynamic fare based on flight and seat context' })
+  @ApiOperation({
+    summary: 'User: Calculate dynamic fare based on flight and seat context',
+  })
   @ApiBody({
     type: CalculateFareDto,
     examples: {
       example1: {
         summary: 'Example Fare Calculation Payload',
         value: {
-          flightId: 'flight-uuid-123',
+          flightId: '30031659-7ac0-4fe7-9160-30eaaee4724c',
           seatClass: 'ECONOMY',
           isWindow: true,
           passengerAge: 65,
@@ -112,5 +116,4 @@ export class FareController {
   calculateFare(@Body() dto: CalculateFareDto) {
     return this.fareService.calculate(dto);
   }
-
 }
