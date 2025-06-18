@@ -10,16 +10,35 @@ import { PrismaService } from 'prisma/prisma.service';
 @Injectable()
 export class BookingService {
   constructor(private prisma: PrismaService) {}
-
-  async lockSeat(seatId: string) {
+  async lockSeat(seatId: string, userId: string) {
     const seat = await this.prisma.seat.findUnique({ where: { id: seatId } });
     if (!seat) throw new NotFoundException('Seat not found');
+
     if (seat.isBooked || isSeatLocked(seatId)) {
       throw new ConflictException('Seat already locked or booked');
     }
-    const locked = lockSeat(seatId);
+
+    const locked = lockSeat(seatId, 180); // Lock for 180 seconds
     if (!locked) throw new ConflictException('Seat is temporarily locked');
-    return { message: 'Seat locked for 90 seconds' };
+
+    const flight = await this.prisma.flight.findUnique({
+      where: { id: seat.flightId },
+      select: {
+        id: true,
+        from: true,
+        to: true,
+        departure: true,
+        arrival: true,
+      },
+    });
+
+    return {
+      message: '✅ Seat locked successfully',
+      seatId,
+      userId,
+      lockDuration: 180,
+      flightDetails: flight,
+    };
   }
 
   async confirmBooking(dto: CreateBookingDto) {
@@ -43,7 +62,12 @@ export class BookingService {
       data: { isBooked: true },
     });
 
-    return { message: 'Booking successful', booking };
+    return {
+      message: '🎫 Booking confirmed!',
+      userId: dto.userId,
+      seatId: dto.seatId,
+      booking,
+    };
   }
 
   async cancelBooking(bookingId: string) {
@@ -59,10 +83,14 @@ export class BookingService {
 
     await this.prisma.booking.delete({ where: { id: bookingId } });
 
-    return { message: 'Booking cancelled and seat released' };
+    return {
+      message: '❌ Booking cancelled and seat released',
+      seatId: booking.seatId,
+      userId: booking.userId,
+    };
   }
 
-  getUserBookings(userId: string) {
+  async getUserBookings(userId: string) {
     return this.prisma.booking.findMany({
       where: { userId },
       include: {
