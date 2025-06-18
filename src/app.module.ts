@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { FlightModule } from './modules/flight/flight.module';
 import { BookingModule } from './modules/booking/booking.module';
-import { SeatModule } from './modules/seat/seat.module';
+
 import { FareModule } from './modules/fare/fare.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
@@ -17,7 +17,7 @@ import { PrismaModule } from './prisma/prisma.module';
     UserModule,
     FlightModule,
     BookingModule,
-    SeatModule,
+  
     FareModule,
     AuthModule,
     PrismaModule,

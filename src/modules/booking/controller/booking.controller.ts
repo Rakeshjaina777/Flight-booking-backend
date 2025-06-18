@@ -2,6 +2,7 @@ import { Controller, Post, Body, Param, Delete, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { BookingService } from '../service/booking.service';
 import { CreateBookingDto, LockSeatDto } from '../dto/create-booking.dto';
+import { GroupBookingDto } from '../dto/group-booking.dto';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -104,5 +105,59 @@ export class BookingController {
   @Get('user/:userId')
   getBookings(@Param('userId') userId: string) {
     return this.bookingService.getUserBookings(userId);
+  }
+  @Post('group')
+  @ApiOperation({ summary: 'Book multiple adjacent seats (Group Booking)' })
+  @ApiBody({
+    type: GroupBookingDto,
+    examples: {
+      example: {
+        summary: 'Sample group booking payload',
+        value: {
+          userId: 'effb2932-9351-4b1e-9dc1-957289f7f88c',
+          flightId: '30031659-7ac0-4fe7-9160-30eaaee4724c',
+          seatClass: 'ECONOMY',
+          count: 3,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Seats booked successfully for a group',
+    schema: {
+      example: {
+        message: 'Group booking confirmed',
+        bookings: [
+          {
+            id: 'booking-1-uuid',
+            userId: 'effb2932-9351-4b1e-9dc1-957289f7f88c',
+            flightId: '30031659-7ac0-4fe7-9160-30eaaee4724c',
+            seatId: 'seat-1-uuid',
+            finalFare: 2500,
+            createdAt: '2025-06-18T12:00:00.000Z',
+          },
+          {
+            id: 'booking-2-uuid',
+            userId: 'f8d5fa92-8f5e-4efb-b5d4-9bc450b1e599',
+            flightId: 'd20ea712-d3cb-4292-a83f-0a4aa6d1aafe',
+            seatId: 'seat-2-uuid',
+            finalFare: 2500,
+            createdAt: '2025-06-18T12:00:01.000Z',
+          },
+          {
+            id: 'booking-3-uuid',
+            userId: 'f8d5fa92-8f5e-4efb-b5d4-9bc450b1e599',
+            flightId: 'd20ea712-d3cb-4292-a83f-0a4aa6d1aafe',
+            seatId: 'seat-3-uuid',
+            finalFare: 2500,
+            createdAt: '2025-06-18T12:00:02.000Z',
+          },
+        ],
+      },
+    },
+  })
+  confirmGroupBooking(@Body() dto: GroupBookingDto) {
+    return this.bookingService.confirmGroupBooking(dto);
   }
 }
