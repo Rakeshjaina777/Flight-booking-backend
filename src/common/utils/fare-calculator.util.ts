@@ -1,55 +1,41 @@
-
-interface FareInput {
+export function calculateFinalFare({
+  baseFare,
+  isWindow,
+  age,
+  bookedSeats,
+  totalSeats,
+  timeBeforeDepartureInMinutes,
+}: {
   baseFare: number;
   isWindow: boolean;
   age: number;
   bookedSeats: number;
   totalSeats: number;
   timeBeforeDepartureInMinutes: number;
-}
+}) {
+  const breakdown: any = { baseFare };
 
-export function calculateFinalFare(input: FareInput): {
-  finalFare: number;
-  breakdown: any;
-} {
-  const breakdown: any = {};
-  let fare = input.baseFare;
-
-  breakdown.base = fare;
-
-  // Age discounts
-  if (input.age >= 60) {
-    const discount = fare * 0.1;
-    fare -= discount;
-    breakdown.seniorDiscount = -discount;
-  } else if (input.age < 3) {
-    breakdown.infant = -fare;
-    fare = 0;
+  if (isWindow) {
+    breakdown.windowCharge = 200;
+    baseFare += 200;
   }
 
-  // Window seat premium
-  if (input.isWindow) {
-    const premium = fare * 0.1;
-    fare += premium;
-    breakdown.windowSeatPremium = premium;
+  if (age >= 60) {
+    breakdown.ageDiscount = -150;
+    baseFare -= 150;
   }
 
-  // Last 20 seats surge pricing
-  if (input.totalSeats - input.bookedSeats <= 20) {
-    const surge = fare * 0.2;
-    fare += surge;
-    breakdown.last20Surge = surge;
-  }
+  const occupancyRate = bookedSeats / totalSeats;
+  const surgeMultiplier = 1 + Math.min(0.5, occupancyRate);
+  breakdown.surgeMultiplier = surgeMultiplier;
+  baseFare *= surgeMultiplier;
 
-  // <4 hour & 50% empty = discount
-  if (
-    input.timeBeforeDepartureInMinutes <= 240 &&
-    input.bookedSeats / input.totalSeats <= 0.5
-  ) {
-    const discount = fare * 0.2;
-    fare -= discount;
-    breakdown.lastMinuteDiscount = -discount;
-  }
+  const timeMultiplier = timeBeforeDepartureInMinutes < 120 ? 1.05 : 1;
+  breakdown.timeAdjustment = timeMultiplier;
+  baseFare *= timeMultiplier;
 
-  return { finalFare: Math.ceil(fare), breakdown };
+  return {
+    finalFare: Math.round(baseFare),
+    breakdown,
+  };
 }
