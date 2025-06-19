@@ -19,6 +19,9 @@ A fully optimized and scalable backend for a flight booking and airline manageme
 
 ---
 
+## 🚀 Video for Refernce
+https://www.loom.com/share/b47ab2b33e2e467a8196ff3f45c5df96?sid=e1bf40ce-a77f-4b5a-bca1-bba5077de475
+
 ## 📦 Core Features
 
 ### ✈️ Flight Management
