@@ -6,7 +6,7 @@ import { FlightModule } from './modules/flight/flight.module';
 import { BookingModule } from './modules/booking/booking.module';
 
 import { FareModule } from './modules/fare/fare.module';
-import { AuthModule } from './modules/auth/auth.module';
+
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 import { PrismaService } from 'prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -19,8 +19,8 @@ import { PrismaModule } from './prisma/prisma.module';
     BookingModule,
   
     FareModule,
-
-    AuthModule,
+//  to implementt in future
+    // AuthModule,
     
     PrismaModule,
   ],
