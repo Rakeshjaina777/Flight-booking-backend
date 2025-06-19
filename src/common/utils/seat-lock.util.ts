@@ -6,6 +6,7 @@ export function lockSeat(seatKey: string, ttl = 90000) {
   lockedSeats.set(seatKey, Date.now());
 
   setTimeout(() => {
+    
     lockedSeats.delete(seatKey);
   }, ttl);
 

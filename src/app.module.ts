@@ -19,7 +19,9 @@ import { PrismaModule } from './prisma/prisma.module';
     BookingModule,
   
     FareModule,
+
     AuthModule,
+    
     PrismaModule,
   ],
   controllers: [AppController],
